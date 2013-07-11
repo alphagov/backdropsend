@@ -1,8 +1,6 @@
-import shlex
-import subprocess
 import tempfile
 import unittest
-from hamcrest import is_, assert_that
+from hamcrest import is_, assert_that, is_not
 from tests.functional import command
 from tests.functional.http_stub import HttpStub
 
@@ -22,8 +20,8 @@ class TestBackdropSend(unittest.TestCase):
         f.flush()
 
         command.do("bin/backdrop-send "
-                        "--url http://localhost:8000/bucket "
-                        "--token bucket-auth-token %s" % f.name)
+                   "--url http://localhost:8000/bucket "
+                   "--token bucket-auth-token %s" % f.name)
 
         request = HttpStub.last_request()
 
@@ -33,10 +31,9 @@ class TestBackdropSend(unittest.TestCase):
         assert_that(request["headers"]["authorization"], is_("Bearer bucket-auth-token"))
 
     def test_it_reads_data_from_stdin_to_post_to_backdrop(self):
-
         command.do("bin/backdrop-send "
-                        "--url http://localhost:8000/bucket "
-                        "--token bucket-auth-token", stdin='{"key": "value"}')
+                   "--url http://localhost:8000/bucket "
+                   "--token bucket-auth-token", stdin='{"key": "value"}')
 
         request = HttpStub.last_request()
 
@@ -44,3 +41,10 @@ class TestBackdropSend(unittest.TestCase):
         assert_that(request["body"], is_('{"key": "value"}'))
         assert_that(request["headers"]["content-type"], is_("application/json"))
         assert_that(request["headers"]["authorization"], is_("Bearer bucket-auth-token"))
+
+    def test_it_fails_if_neither_file_nor_stdin_provided(self):
+        cmd = command.do("bin/backdrop-send "
+                         "--url http://localhost:8000/bucket "
+                         "--token bucket-auth-token")
+
+        assert_that(cmd.exit_status, is_not(0))

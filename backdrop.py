@@ -14,7 +14,12 @@ def parse_args(args, input):
     parser.add_argument('file', help="File containing JSON to send", nargs='?',
                         type=argparse.FileType('r'),
                         default=input)
-    return parser.parse_args(args)
+    arguments = parser.parse_args(args)
+
+    if arguments.file.isatty():
+        parser.error("No input provided")
+
+    return arguments
 
 
 def send(args, input=None):
