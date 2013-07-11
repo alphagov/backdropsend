@@ -3,6 +3,7 @@ import subprocess
 import tempfile
 import unittest
 from hamcrest import is_, assert_that
+from tests.functional import command
 from tests.functional.http_stub import HttpStub
 
 
@@ -14,19 +15,13 @@ class TestBackdropSend(unittest.TestCase):
     def tearDown(self):
         HttpStub.stop()
 
-    def do_command(self, command, stdin=None):
-        p = subprocess.Popen(shlex.split(command), stdin=subprocess.PIPE)
-        if stdin:
-            p.stdin.write(stdin)
-        p.communicate()
-
     def test_it_posts_data_to_bucket_url_with_auth_token(self):
 
         f = tempfile.NamedTemporaryFile(suffix=".json")
         f.write('{"key": "value"}')
         f.flush()
 
-        self.do_command("bin/backdrop-send "
+        command.do("bin/backdrop-send "
                         "--url http://localhost:8000/bucket "
                         "--token bucket-auth-token %s" % f.name)
 
@@ -39,7 +34,7 @@ class TestBackdropSend(unittest.TestCase):
 
     def test_it_reads_data_from_stdin_to_post_to_backdrop(self):
 
-        self.do_command("bin/backdrop-send "
+        command.do("bin/backdrop-send "
                         "--url http://localhost:8000/bucket "
                         "--token bucket-auth-token", stdin='{"key": "value"}')
 
