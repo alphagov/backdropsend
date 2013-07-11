@@ -1,53 +1,20 @@
-from BaseHTTPServer import HTTPServer, BaseHTTPRequestHandler
+from BaseHTTPServer import HTTPServer
 from io import StringIO
-import os
 import tempfile
 import threading
 import unittest
 from hamcrest import is_, assert_that
-import mock
 import backdrop
-
-
-class HttpStub(BaseHTTPRequestHandler):
-
-    requests = []
-
-    @classmethod
-    def last_request(cls):
-        return cls.requests[0]
-
-    @classmethod
-    def reset(cls):
-        cls.requests = []
-
-    def do_POST(self):
-        self.requests.append( {
-            "headers": dict(self.headers),
-            "path": self.path,
-            "body": self.body()
-        })
-
-        self.send_response(200)
-
-        return
-
-    def body(self):
-        return self.rfile.read(int(self.headers.getheader('content-length')))
+from tests.functional.http_stub import HttpStub
 
 
 class TestBackdropSend(unittest.TestCase):
 
     def setUp(self):
-        HttpStub.reset()
-        self.httpd = HTTPServer(("", 8000), HttpStub)
-        self.thread = threading.Thread(target=self.httpd.serve_forever)
-        self.thread.start()
+        HttpStub.start()
 
     def tearDown(self):
-        self.httpd.shutdown()
-        self.httpd.server_close()
-        self.thread.join()
+        HttpStub.stop()
 
     def test_it_posts_data_to_bucket_url_with_auth_token(self):
 
@@ -79,4 +46,3 @@ class TestBackdropSend(unittest.TestCase):
         assert_that(request["body"], is_('{"key": "value"}'))
         assert_that(request["headers"]["content-type"], is_("application/json"))
         assert_that(request["headers"]["authorization"], is_("Bearer bucket-auth-token"))
-
