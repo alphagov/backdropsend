@@ -27,10 +27,12 @@ def send(args, input=None):
 
     data = arguments.file.read()
 
-    requests.post(url=arguments.url, data=data, headers={
+    response = requests.post(url=arguments.url, data=data, headers={
         "Authorization": "Bearer " + arguments.token,
         "Content-type": "application/json"
     })
+
+    response.raise_for_status()
 
 
 if __name__ == "__main__":

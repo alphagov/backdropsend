@@ -48,3 +48,11 @@ class TestBackdropSend(unittest.TestCase):
                          "--token bucket-auth-token")
 
         assert_that(cmd.exit_status, is_not(0))
+
+    def test_it_returns_non_0_if_backdrop_returns_an_error_code(self):
+        HttpStub.set_response_code(500)
+        cmd = command.do("bin/backdrop-send "
+                   "--url http://localhost:8000/bucket "
+                   "--token bucket-auth-token", stdin='{"key": "value"}')
+
+        assert_that(cmd.exit_status, is_not(0))

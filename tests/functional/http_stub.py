@@ -7,6 +7,7 @@ class HttpStub(BaseHTTPRequestHandler):
     requests = []
     server = None
     thread = None
+    response_code = 200
 
     @classmethod
     def last_request(cls):
@@ -15,6 +16,7 @@ class HttpStub(BaseHTTPRequestHandler):
     @classmethod
     def reset(cls):
         cls.requests = []
+        cls.response_code = 200
 
     def do_POST(self):
         self.requests.append( {
@@ -23,7 +25,7 @@ class HttpStub(BaseHTTPRequestHandler):
             "body": self.body()
         })
 
-        self.send_response(200)
+        self.send_response(self.response_code)
 
         return
 
@@ -42,3 +44,7 @@ class HttpStub(BaseHTTPRequestHandler):
         cls.server.shutdown()
         cls.server.server_close()
         cls.thread.join()
+
+    @classmethod
+    def set_response_code(cls, code):
+        cls.response_code = code
