@@ -49,8 +49,3 @@ def send(args, input=None):
             fail(HTTP_ERROR, status=response.status_code)
     except requests.ConnectionError as e:
         fail(CONNECTION_ERROR)
-
-
-
-if __name__ == "__main__":
-    send(sys.argv[1:], input=sys.stdin)
