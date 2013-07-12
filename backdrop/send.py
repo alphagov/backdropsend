@@ -4,7 +4,6 @@ import sys
 import requests
 
 
-
 def parse_args(args, input):
     parser = argparse.ArgumentParser()
     parser.add_argument('--url', help="URL of the target bucket",
@@ -22,9 +21,11 @@ def parse_args(args, input):
     return arguments
 
 
-UNAUTHORIZED = ("Unable to send to backdrop. Unauthorised: check your access token.", 4)
+UNAUTHORIZED = ("Unable to send to backdrop. "
+                "Unauthorised: check your access token.", 4)
 HTTP_ERROR = ("Unable to send to backdrop. Server responded with {status}.", 8)
 CONNECTION_ERROR = ("Unable to send to backdrop. Connection error.", 16)
+
 
 def fail(error, **kwargs):
     print >> sys.stderr, error[0].format(**kwargs)

@@ -19,7 +19,7 @@ class HttpStub(BaseHTTPRequestHandler):
         cls.response_code = 200
 
     def do_POST(self):
-        self.requests.append( {
+        self.requests.append({
             "headers": dict(self.headers),
             "path": self.path,
             "body": self.body()
