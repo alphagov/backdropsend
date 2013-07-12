@@ -4,6 +4,7 @@ import sys
 import requests
 
 
+
 def parse_args(args, input):
     parser = argparse.ArgumentParser()
     parser.add_argument('--url', help="URL of the target bucket",
@@ -21,6 +22,15 @@ def parse_args(args, input):
     return arguments
 
 
+UNAUTHORIZED = ("Unable to send to backdrop. Unauthorised: check your access token.", 4)
+HTTP_ERROR = ("Unable to send to backdrop. Server responded with {status}.", 8)
+CONNECTION_ERROR = ("Unable to send to backdrop. Connection error.", 16)
+
+def fail(error, **kwargs):
+    print >> sys.stderr, error[0].format(**kwargs)
+    exit(error[1])
+
+
 def send(args, input=None):
     arguments = parse_args(args, input)
 
@@ -32,12 +42,13 @@ def send(args, input=None):
             "Content-type": "application/json"
         })
 
+        if response.status_code == 403:
+            fail(UNAUTHORIZED)
+
         if response.status_code < 200 or response.status_code >= 300:
-            print >> sys.stderr, "Unable to send to backdrop. Server responded with %s" %  response.status_code
-            exit(1)
+            fail(HTTP_ERROR, status=response.status_code)
     except requests.ConnectionError as e:
-        print >> sys.stderr, "Unable to send to backdrop. Connection error."
-        exit(1)
+        fail(CONNECTION_ERROR)
 
 
 

@@ -49,7 +49,7 @@ class TestBackdropSend(unittest.TestCase):
 
         assert_that(cmd.exit_status, is_not(0))
 
-    def test_it_returns_non_0_if_backdrop_returns_an_error_code(self):
+    def test_it_reports_http_errors(self):
         HttpStub.set_response_code(500)
         cmd = command.do("bin/backdrop-send "
                    "--url http://localhost:8000/bucket "
@@ -59,10 +59,21 @@ class TestBackdropSend(unittest.TestCase):
         assert_that(cmd.stderr, contains_string("Unable to send to backdrop"))
         assert_that(cmd.stderr, contains_string("500"))
 
-    def test_it_returns_non_0_if_connection_fails(self):
+    def test_it_reports_connection_errors(self):
         cmd = command.do("bin/backdrop-send "
                    "--url http://non-existent-url "
                    "--token bucket-auth-token", stdin='{"key": "value"}')
 
         assert_that(cmd.exit_status, is_not(0))
         assert_that(cmd.stderr, contains_string("Unable to send to backdrop"))
+
+    def test_it_reports_authorization_errors(self):
+        HttpStub.set_response_code(403)
+        cmd = command.do("bin/backdrop-send "
+                   "--url http://localhost:8000/bucket "
+                   "--token wrong-token", stdin='{"key": "value"}')
+
+        assert_that(cmd.exit_status, is_not(0))
+        assert_that(cmd.stderr, contains_string(
+            "Unable to send to backdrop. "
+            "Unauthorised: check your access token."))
