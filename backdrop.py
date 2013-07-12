@@ -1,8 +1,7 @@
-import os
-from pprint import pprint
-import requests
 import argparse
 import sys
+
+import requests
 
 
 def parse_args(args, input):
@@ -27,12 +26,19 @@ def send(args, input=None):
 
     data = arguments.file.read()
 
-    response = requests.post(url=arguments.url, data=data, headers={
-        "Authorization": "Bearer " + arguments.token,
-        "Content-type": "application/json"
-    })
+    try:
+        response = requests.post(url=arguments.url, data=data, headers={
+            "Authorization": "Bearer " + arguments.token,
+            "Content-type": "application/json"
+        })
 
-    response.raise_for_status()
+        if response.status_code < 200 or response.status_code >= 300:
+            print >> sys.stderr, "Unable to send to backdrop. Server responded with %s" %  response.status_code
+            exit(1)
+    except requests.ConnectionError as e:
+        print >> sys.stderr, "Unable to send to backdrop. Connection error."
+        exit(1)
+
 
 
 if __name__ == "__main__":

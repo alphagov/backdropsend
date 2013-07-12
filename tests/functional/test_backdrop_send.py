@@ -1,6 +1,6 @@
 import tempfile
 import unittest
-from hamcrest import is_, assert_that, is_not
+from hamcrest import *
 from tests.functional import command
 from tests.functional.http_stub import HttpStub
 
@@ -56,3 +56,13 @@ class TestBackdropSend(unittest.TestCase):
                    "--token bucket-auth-token", stdin='{"key": "value"}')
 
         assert_that(cmd.exit_status, is_not(0))
+        assert_that(cmd.stderr, contains_string("Unable to send to backdrop"))
+        assert_that(cmd.stderr, contains_string("500"))
+
+    def test_it_returns_non_0_if_connection_fails(self):
+        cmd = command.do("bin/backdrop-send "
+                   "--url http://non-existent-url "
+                   "--token bucket-auth-token", stdin='{"key": "value"}')
+
+        assert_that(cmd.exit_status, is_not(0))
+        assert_that(cmd.stderr, contains_string("Unable to send to backdrop"))
