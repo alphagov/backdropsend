@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/alphagov/backdrop-send.png)](https://travis-ci.org/alphagov/backdrop-send)
+
 backdrop-send
 =============
 
