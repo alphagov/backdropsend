@@ -17,4 +17,3 @@ source $VIRTUALENV_DIR/bin/activate
 pip install -r requirements_for_tests.txt
 
 nosetests
-

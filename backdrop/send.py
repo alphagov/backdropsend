@@ -1,8 +1,13 @@
 import argparse
 import sys
+import select
 
 import requests
 
+
+def no_piped_input(arguments):
+    inputs_ready, _, _ = select.select([arguments.file], [], [], 0)
+    return not bool(inputs_ready)
 
 def parse_args(args, input):
     parser = argparse.ArgumentParser()
@@ -15,7 +20,7 @@ def parse_args(args, input):
                         default=input)
     arguments = parser.parse_args(args)
 
-    if arguments.file.isatty():
+    if no_piped_input(arguments):
         parser.error("No input provided")
 
     return arguments
@@ -30,7 +35,6 @@ CONNECTION_ERROR = ("Unable to send to backdrop. Connection error.", 16)
 def fail(error, **kwargs):
     print >> sys.stderr, error[0].format(**kwargs)
     exit(error[1])
-
 
 def send(args, input=None):
     arguments = parse_args(args, input)
