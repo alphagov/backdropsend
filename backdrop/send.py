@@ -35,30 +35,25 @@ def parse_args(args, input):
     return arguments
 
 
+OK = ("", 0)
 UNAUTHORIZED = ("Unable to send to backdrop. "
                 "Unauthorised: check your access token.", 4)
 HTTP_ERROR = ("Unable to send to backdrop. Server responded with {status}. "
               "Error: {message}.", 8)
 CONNECTION_ERROR = ("Unable to send to backdrop. Connection error.", 16)
 
-def fail(error, last_retry, **kwargs):
+def error_with_log(error, **kwargs):
     print >> sys.stderr, error[0].format(**kwargs)
-    if last_retry:        
-        exit(error[1])
-    else:
-        print >> sys.stderr, "Retrying..."
+    return error
 
-def ok():
-    exit(0)
-
-def handle_response(response, last_retry):
+def handle_response(response):
     if response.status_code == 403:
-        fail(UNAUTHORIZED, True)
+        return error_with_log(UNAUTHORIZED)
 
     if response.status_code < 200 or response.status_code >= 300:
-        fail(HTTP_ERROR, last_retry, status=response.status_code, message=response.text)
-    else:
-        ok()
+        return error_with_log(HTTP_ERROR, status=response.status_code, message=response.text)
+    
+    return OK
 
 
 def send(args, input=None):
@@ -70,6 +65,8 @@ def send(args, input=None):
     if arguments.failfast:
         attempts = 1
 
+    status = OK
+
     for i in range(attempts):
         last_retry = i == (attempts - 1)
         try:
@@ -78,8 +75,14 @@ def send(args, input=None):
                 "Content-type": "application/json"
             }, timeout=arguments.timeout)
 
-            handle_response(response, last_retry)
+            status = handle_response(response)
         except (requests.ConnectionError, requests.exceptions.Timeout) as e:
-            fail(CONNECTION_ERROR, last_retry)
+            status = error_with_log(CONNECTION_ERROR)
 
+        if status[1] == 0 or last_retry:
+          break
+
+        print >> sys.stderr, "Retrying..."
         time.sleep(arguments.sleep)
+
+    exit(status[1])
