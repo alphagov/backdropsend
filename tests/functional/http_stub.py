@@ -1,6 +1,7 @@
 from BaseHTTPServer import BaseHTTPRequestHandler, HTTPServer
 import threading
-
+import time
+import errno
 
 class HttpStub(BaseHTTPRequestHandler):
 
@@ -8,6 +9,7 @@ class HttpStub(BaseHTTPRequestHandler):
     server = None
     thread = None
     response_code = 200
+    response_delay = 0
 
     @classmethod
     def last_request(cls):
@@ -17,6 +19,7 @@ class HttpStub(BaseHTTPRequestHandler):
     def reset(cls):
         cls.requests = []
         cls.response_code = 200
+        cls.response_delay = 0
 
     def do_POST(self):
         self.requests.append({
@@ -25,7 +28,16 @@ class HttpStub(BaseHTTPRequestHandler):
             "body": self.body()
         })
 
-        self.send_response(self.response_code)
+        if (self.response_delay > 0):
+            time.sleep(self.response_delay)
+        
+        try:
+            self.send_response(self.response_code)
+        except IOError, e:
+            if e.errno == errno.EPIPE:
+                pass
+            else:
+                raise e
 
         return
 
@@ -48,3 +60,7 @@ class HttpStub(BaseHTTPRequestHandler):
     @classmethod
     def set_response_code(cls, code):
         cls.response_code = code
+
+    @classmethod
+    def set_response_delay(cls, delay):
+        cls.response_delay = delay

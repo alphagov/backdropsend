@@ -79,3 +79,14 @@ class TestBackdropSend(unittest.TestCase):
         assert_that(cmd.stderr, contains_string(
             "Unable to send to backdrop. "
             "Unauthorised: check your access token."))
+
+    def test_it_fails_when_request_takes_longer_than_default_timeout(self):
+        HttpStub.set_response_delay(7)
+        cmd = command.do("./backdrop-send "
+                         "--url http://localhost:8000/bucket "
+                         "--token token", stdin='{"key": "value"}')
+
+        assert_that(cmd.exit_status, is_not(0))
+        assert_that(cmd.stderr, contains_string(
+            "Unable to send to backdrop. "
+            "Connection error."))

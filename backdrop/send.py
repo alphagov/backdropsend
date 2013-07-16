@@ -45,12 +45,12 @@ def send(args, input=None):
         response = requests.post(url=arguments.url, data=data, headers={
             "Authorization": "Bearer " + arguments.token,
             "Content-type": "application/json"
-        })
+        }, timeout=5)
 
         if response.status_code == 403:
             fail(UNAUTHORIZED)
 
         if response.status_code < 200 or response.status_code >= 300:
             fail(HTTP_ERROR, status=response.status_code)
-    except requests.ConnectionError as e:
+    except (requests.ConnectionError, requests.exceptions.Timeout) as e:
         fail(CONNECTION_ERROR)
