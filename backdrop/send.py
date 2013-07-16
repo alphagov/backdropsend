@@ -19,6 +19,8 @@ def parse_args(args, input):
                         required=False, default=5, type=float)
     parser.add_argument('--attempts', help="Number of times to attempt sending data. Default: 3",
                         required=False, default=3, type=int)
+    parser.add_argument('--failfast', help="Don't retry sending data",
+                        required=False, default=False, action='store_true')
     parser.add_argument('file', help="File containing JSON to send", nargs='?',
                         type=argparse.FileType('r'),
                         default=input)
@@ -51,6 +53,9 @@ def send(args, input=None):
 
     data = arguments.file.read()
     attempts = arguments.attempts
+
+    if arguments.failfast:
+        attempts = 1
 
     for i in range(attempts):
         last_retry = i == (attempts - 1)
