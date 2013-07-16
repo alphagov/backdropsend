@@ -1,0 +1,33 @@
+.TH backdrop-send 1 "16 Jul 2013" "version 0.0.1"
+.SH NAME
+backdrop-send \- send data to backdrop
+.SH SYNOPSIS
+.B backdrop-send [-h] --url
+.I url-to-bucket
+.B --token
+.I authorization-token
+.B [file-to-send]
+.P
+.I pipe
+.B | backdrop-send --url
+.I url-to-backdrop
+.B --token
+.I authorization-token
+.SH DESCRIPTION
+Sends data to a bucket in 
+.B backdrop 
+over http using a bearer token for authentication.
+.SH OPTIONS
+.IP "-h --help"
+print help message and exit
+.IP --token
+the authorization token for the bucket
+.IP --url
+the url of the backdrop bucket eg.
+.I http://location_of_backdrop/my_bucket
+.SH FILES
+.IP [file-to-send]
+utf8 encoded file in json format
+.\" This is the last section by convention
+.SH SEE ALSO
+.I https://github.com/alphagov/backdrop-send
