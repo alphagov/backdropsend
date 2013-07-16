@@ -34,16 +34,18 @@ def parse_args(args, input):
 
     return arguments
 
+def status(message, code):
+  return { 'code': code, 'message': message, 'details': {} }
 
-OK = ("", 0)
-UNAUTHORIZED = ("Unable to send to backdrop. "
+OK = status("", 0)
+UNAUTHORIZED = status("Unable to send to backdrop. "
                 "Unauthorised: check your access token.", 4)
-HTTP_ERROR = ("Unable to send to backdrop. Server responded with {status}. "
+HTTP_ERROR = status("Unable to send to backdrop. Server responded with {status}. "
               "Error: {message}.", 8)
-CONNECTION_ERROR = ("Unable to send to backdrop. Connection error.", 16)
+CONNECTION_ERROR = status("Unable to send to backdrop. Connection error.", 16)
 
 def error_with_log(error, **kwargs):
-    print >> sys.stderr, error[0].format(**kwargs)
+    print >> sys.stderr, error['message'].format(**kwargs)
     return error
 
 def handle_response(response):
@@ -79,10 +81,10 @@ def send(args, input=None):
         except (requests.ConnectionError, requests.exceptions.Timeout) as e:
             status = error_with_log(CONNECTION_ERROR)
 
-        if status[1] == 0 or last_retry:
+        if status['code'] == 0 or last_retry:
           break
 
         print >> sys.stderr, "Retrying..."
         time.sleep(arguments.sleep)
 
-    exit(status[1])
+    exit(status['code'])
