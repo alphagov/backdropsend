@@ -1,6 +1,6 @@
-[![Build Status](https://travis-ci.org/alphagov/backdrop-send.png)](https://travis-ci.org/alphagov/backdrop-send)
+[![Build Status](https://travis-ci.org/alphagov/backdropsend.png)](https://travis-ci.org/alphagov/backdropsend)
 
-backdrop-send
+backdropsend
 =============
 
 CLI tool for sending data to Backdrop
