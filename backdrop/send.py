@@ -44,19 +44,29 @@ HTTP_ERROR = status("Unable to send to backdrop. Server responded with {status}.
               "Error: {message}.", 8)
 CONNECTION_ERROR = status("Unable to send to backdrop. Connection error.", 16)
 
-def error_with_log(error, **kwargs):
-    print >> sys.stderr, error['message'].format(**kwargs)
-    return error
+def log(message):
+    print >> sys.stderr, message
 
 def handle_response(response):
     if response.status_code == 403:
-        return error_with_log(UNAUTHORIZED)
+        return UNAUTHORIZED
 
     if response.status_code < 200 or response.status_code >= 300:
-        return error_with_log(HTTP_ERROR, status=response.status_code, message=response.text)
+        HTTP_ERROR['details'] = { 'status': response.status_code, 'message': response.text }
+        return HTTP_ERROR
     
     return OK
 
+def post(data, arguments):
+    try:
+        response = requests.post(url=arguments.url, data=data, headers={
+            "Authorization": "Bearer " + arguments.token,
+            "Content-type": "application/json"
+        }, timeout=arguments.timeout)
+
+        return handle_response(response)
+    except (requests.ConnectionError, requests.exceptions.Timeout) as e:
+        return CONNECTION_ERROR
 
 def send(args, input=None):
     arguments = parse_args(args, input)
@@ -67,24 +77,17 @@ def send(args, input=None):
     if arguments.failfast:
         attempts = 1
 
-    status = OK
-
     for i in range(attempts):
         last_retry = i == (attempts - 1)
-        try:
-            response = requests.post(url=arguments.url, data=data, headers={
-                "Authorization": "Bearer " + arguments.token,
-                "Content-type": "application/json"
-            }, timeout=arguments.timeout)
+        
+        status = post(data, arguments)
 
-            status = handle_response(response)
-        except (requests.ConnectionError, requests.exceptions.Timeout) as e:
-            status = error_with_log(CONNECTION_ERROR)
+        log(status['message'].format(**status['details']))
 
         if status['code'] == 0 or last_retry:
-          break
+            break
 
-        print >> sys.stderr, "Retrying..."
+        log("Retrying...")
         time.sleep(arguments.sleep)
 
     exit(status['code'])
