@@ -90,3 +90,25 @@ class TestBackdropSend(unittest.TestCase):
         assert_that(cmd.stderr, contains_string(
             "Unable to send to backdrop. "
             "Connection error."))
+
+    def test_it_fails_when_request_takes_longer_than_specified_timeout(self):
+        HttpStub.set_response_delay(2)
+        cmd = command.do("./backdrop-send "
+                         "--url http://localhost:8000/bucket "
+                         "--token token "
+                         "--timeout 1", stdin='{"key": "value"}')
+
+        assert_that(cmd.exit_status, is_not(0))
+        assert_that(cmd.stderr, contains_string(
+            "Unable to send to backdrop. "
+            "Connection error."))       
+
+    def test_it_passes_when_request_takes_less_than_specified_timeout(self):
+        HttpStub.set_response_delay(1)
+        cmd = command.do("./backdrop-send "
+                         "--url http://localhost:8000/bucket "
+                         "--token token "
+                         "--timeout 5", stdin='{"key": "value"}')
+
+        assert_that(cmd.exit_status, is_(0))
+            

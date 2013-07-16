@@ -15,6 +15,8 @@ def parse_args(args, input):
                         required=True)
     parser.add_argument('--token', help="Bearer token for the target bucket",
                         required=True)
+    parser.add_argument('--timeout', help="Request timeout. Default: 5 seconds",
+                        required=False, default=5, type=float)
     parser.add_argument('file', help="File containing JSON to send", nargs='?',
                         type=argparse.FileType('r'),
                         default=input)
@@ -45,7 +47,7 @@ def send(args, input=None):
         response = requests.post(url=arguments.url, data=data, headers={
             "Authorization": "Bearer " + arguments.token,
             "Content-type": "application/json"
-        }, timeout=5)
+        }, timeout=arguments.timeout)
 
         if response.status_code == 403:
             fail(UNAUTHORIZED)
