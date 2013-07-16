@@ -37,7 +37,8 @@ def parse_args(args, input):
 
 UNAUTHORIZED = ("Unable to send to backdrop. "
                 "Unauthorised: check your access token.", 4)
-HTTP_ERROR = ("Unable to send to backdrop. Server responded with {status}.", 8)
+HTTP_ERROR = ("Unable to send to backdrop. Server responded with {status}. "
+              "Error: {message}.", 8)
 CONNECTION_ERROR = ("Unable to send to backdrop. Connection error.", 16)
 
 def fail(error, last_retry, **kwargs):
@@ -48,7 +49,7 @@ def fail(error, last_retry, **kwargs):
         print >> sys.stderr, "Retrying..."
 
 def ok():
-    exit(0)        
+    exit(0)
 
 def send(args, input=None):
     arguments = parse_args(args, input)
@@ -71,7 +72,7 @@ def send(args, input=None):
                 fail(UNAUTHORIZED, True)
 
             if response.status_code < 200 or response.status_code >= 300:
-                fail(HTTP_ERROR, last_retry, status=response.status_code)
+                fail(HTTP_ERROR, last_retry, status=response.status_code, message=response.text)
             else:
                 ok()
         except (requests.ConnectionError, requests.exceptions.Timeout) as e:
