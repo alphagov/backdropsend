@@ -1,7 +1,6 @@
 import argparse
 import sys
 import select
-
 import requests
 
 
