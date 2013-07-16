@@ -5,11 +5,8 @@ import errno
 
 class HttpStub(BaseHTTPRequestHandler):
 
-    requests = []
     server = None
     thread = None
-    response_code = 200
-    response_delay = 0
 
     @classmethod
     def last_request(cls):
@@ -18,7 +15,7 @@ class HttpStub(BaseHTTPRequestHandler):
     @classmethod
     def reset(cls):
         cls.requests = []
-        cls.response_code = 200
+        cls.response_codes = [200]        
         cls.response_delay = 0
 
     def do_POST(self):
@@ -32,7 +29,9 @@ class HttpStub(BaseHTTPRequestHandler):
             time.sleep(self.response_delay)
         
         try:
-            self.send_response(self.response_code)
+            next_response = self.response_codes.pop(0)
+            self.response_codes.append(next_response)
+            self.send_response(next_response)
         except IOError, e:
             if e.errno == errno.EPIPE:
                 pass
@@ -58,8 +57,8 @@ class HttpStub(BaseHTTPRequestHandler):
         cls.thread.join()
 
     @classmethod
-    def set_response_code(cls, code):
-        cls.response_code = code
+    def set_response_codes(cls, *codes):
+        cls.response_codes = list(codes)
 
     @classmethod
     def set_response_delay(cls, delay):

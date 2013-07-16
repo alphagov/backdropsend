@@ -34,25 +34,36 @@ HTTP_ERROR = ("Unable to send to backdrop. Server responded with {status}.", 8)
 CONNECTION_ERROR = ("Unable to send to backdrop. Connection error.", 16)
 
 
-def fail(error, **kwargs):
+def fail(error, last_retry, **kwargs):
     print >> sys.stderr, error[0].format(**kwargs)
-    exit(error[1])
+    if last_retry:        
+        exit(error[1])
+    else:
+        print >> sys.stderr, "Retrying..."
+
+def ok():
+    exit(0)        
 
 def send(args, input=None):
     arguments = parse_args(args, input)
 
     data = arguments.file.read()
+    retries = 3
 
-    try:
-        response = requests.post(url=arguments.url, data=data, headers={
-            "Authorization": "Bearer " + arguments.token,
-            "Content-type": "application/json"
-        }, timeout=arguments.timeout)
+    for i in range(retries):
+        last_retry = (i + 1) == retries
+        try:
+            response = requests.post(url=arguments.url, data=data, headers={
+                "Authorization": "Bearer " + arguments.token,
+                "Content-type": "application/json"
+            }, timeout=arguments.timeout)
 
-        if response.status_code == 403:
-            fail(UNAUTHORIZED)
+            if response.status_code == 403:
+                fail(UNAUTHORIZED, True)
 
-        if response.status_code < 200 or response.status_code >= 300:
-            fail(HTTP_ERROR, status=response.status_code)
-    except (requests.ConnectionError, requests.exceptions.Timeout) as e:
-        fail(CONNECTION_ERROR)
+            if response.status_code < 200 or response.status_code >= 300:
+                fail(HTTP_ERROR, last_retry, status=response.status_code)
+            else:
+                ok()
+        except (requests.ConnectionError, requests.exceptions.Timeout) as e:
+            fail(CONNECTION_ERROR, last_retry)

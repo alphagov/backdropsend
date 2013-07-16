@@ -52,7 +52,7 @@ class TestBackdropSend(unittest.TestCase):
         assert_that(cmd.exit_status, is_not(0))
 
     def test_it_reports_http_errors(self):
-        HttpStub.set_response_code(500)
+        HttpStub.set_response_codes(500)
         cmd = command.do("./backdrop-send "
                          "--url http://localhost:8000/bucket "
                          "--token bucket-auth-token", stdin='{"key": "value"}')
@@ -60,6 +60,14 @@ class TestBackdropSend(unittest.TestCase):
         assert_that(cmd.exit_status, is_not(0))
         assert_that(cmd.stderr, contains_string("Unable to send to backdrop"))
         assert_that(cmd.stderr, contains_string("500"))
+
+    def test_it_passes_after_default_number_of_retries(self):
+        HttpStub.set_response_codes(500, 500, 200)
+        cmd = command.do("./backdrop-send "
+                         "--url http://localhost:8000/bucket "
+                         "--token bucket-auth-token", stdin='{"key": "value"}')
+
+        assert_that(cmd.exit_status, is_(0))
 
     def test_it_reports_connection_errors(self):
         cmd = command.do("./backdrop-send "
@@ -70,7 +78,7 @@ class TestBackdropSend(unittest.TestCase):
         assert_that(cmd.stderr, contains_string("Unable to send to backdrop"))
 
     def test_it_reports_authorization_errors(self):
-        HttpStub.set_response_code(403)
+        HttpStub.set_response_codes(403)
         cmd = command.do("./backdrop-send "
                          "--url http://localhost:8000/bucket "
                          "--token wrong-token", stdin='{"key": "value"}')
@@ -110,5 +118,4 @@ class TestBackdropSend(unittest.TestCase):
                          "--token token "
                          "--timeout 5", stdin='{"key": "value"}')
 
-        assert_that(cmd.exit_status, is_(0))
-            
+        assert_that(cmd.exit_status, is_(0))            
