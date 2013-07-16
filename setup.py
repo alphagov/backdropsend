@@ -2,7 +2,7 @@ import backdrop
 from setuptools import setup, find_packages
 
 setup(
-    name='backdrop-send',
+    name='backdropsend',
     version=backdrop.__VERSION__,
     packages=find_packages(exclude=['test*']),
     scripts=['backdrop-send'],
