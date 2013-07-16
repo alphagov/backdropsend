@@ -69,6 +69,24 @@ class TestBackdropSend(unittest.TestCase):
 
         assert_that(cmd.exit_status, is_(0))
 
+    def test_it_passes_after_specified_number_of_retries(self):
+        HttpStub.set_response_codes(500, 500, 500, 200)
+        cmd = command.do("./backdrop-send "
+                         "--url http://localhost:8000/bucket "
+                         "--token bucket-auth-token "
+                         "--attempts 4", stdin='{"key": "value"}')
+
+        assert_that(cmd.exit_status, is_(0))
+
+    def test_it_fails_after_specified_number_of_retries(self):
+        HttpStub.set_response_codes(500, 500, 200)
+        cmd = command.do("./backdrop-send "
+                         "--url http://localhost:8000/bucket "
+                         "--token bucket-auth-token "
+                         "--attempts 2", stdin='{"key": "value"}')
+
+        assert_that(cmd.exit_status, is_not(0))
+
     def test_it_reports_connection_errors(self):
         cmd = command.do("./backdrop-send "
                          "--url http://non-existent-url "
@@ -92,7 +110,8 @@ class TestBackdropSend(unittest.TestCase):
         HttpStub.set_response_delay(7)
         cmd = command.do("./backdrop-send "
                          "--url http://localhost:8000/bucket "
-                         "--token token", stdin='{"key": "value"}')
+                         "--token token "
+                         "--attempts 1", stdin='{"key": "value"}')
 
         assert_that(cmd.exit_status, is_not(0))
         assert_that(cmd.stderr, contains_string(
@@ -104,7 +123,8 @@ class TestBackdropSend(unittest.TestCase):
         cmd = command.do("./backdrop-send "
                          "--url http://localhost:8000/bucket "
                          "--token token "
-                         "--timeout 1", stdin='{"key": "value"}')
+                         "--timeout 1 "
+                         "--attempts 1", stdin='{"key": "value"}')
 
         assert_that(cmd.exit_status, is_not(0))
         assert_that(cmd.stderr, contains_string(
@@ -116,6 +136,7 @@ class TestBackdropSend(unittest.TestCase):
         cmd = command.do("./backdrop-send "
                          "--url http://localhost:8000/bucket "
                          "--token token "
-                         "--timeout 5", stdin='{"key": "value"}')
+                         "--timeout 5 "
+                         "--attempts 1", stdin='{"key": "value"}')
 
-        assert_that(cmd.exit_status, is_(0))            
+        assert_that(cmd.exit_status, is_(0))

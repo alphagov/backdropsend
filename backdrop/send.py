@@ -17,6 +17,8 @@ def parse_args(args, input):
                         required=True)
     parser.add_argument('--timeout', help="Request timeout. Default: 5 seconds",
                         required=False, default=5, type=float)
+    parser.add_argument('--attempts', help="Number of times to attempt sending data. Default: 3",
+                        required=False, default=3, type=int)
     parser.add_argument('file', help="File containing JSON to send", nargs='?',
                         type=argparse.FileType('r'),
                         default=input)
@@ -48,10 +50,10 @@ def send(args, input=None):
     arguments = parse_args(args, input)
 
     data = arguments.file.read()
-    retries = 3
+    attempts = arguments.attempts
 
-    for i in range(retries):
-        last_retry = (i + 1) == retries
+    for i in range(attempts):
+        last_retry = i == (attempts - 1)
         try:
             response = requests.post(url=arguments.url, data=data, headers={
                 "Authorization": "Bearer " + arguments.token,
