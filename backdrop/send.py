@@ -51,6 +51,16 @@ def fail(error, last_retry, **kwargs):
 def ok():
     exit(0)
 
+def handle_response(response, last_retry):
+    if response.status_code == 403:
+        fail(UNAUTHORIZED, True)
+
+    if response.status_code < 200 or response.status_code >= 300:
+        fail(HTTP_ERROR, last_retry, status=response.status_code, message=response.text)
+    else:
+        ok()
+
+
 def send(args, input=None):
     arguments = parse_args(args, input)
 
@@ -68,13 +78,7 @@ def send(args, input=None):
                 "Content-type": "application/json"
             }, timeout=arguments.timeout)
 
-            if response.status_code == 403:
-                fail(UNAUTHORIZED, True)
-
-            if response.status_code < 200 or response.status_code >= 300:
-                fail(HTTP_ERROR, last_retry, status=response.status_code, message=response.text)
-            else:
-                ok()
+            handle_response(response, last_retry)
         except (requests.ConnectionError, requests.exceptions.Timeout) as e:
             fail(CONNECTION_ERROR, last_retry)
 
