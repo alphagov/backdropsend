@@ -65,6 +65,7 @@ class TestBackdropSend(unittest.TestCase):
         HttpStub.set_response_codes(500, 500, 200)
         cmd = command.do("./backdrop-send "
                          "--url http://localhost:8000/bucket "
+                         "--sleep 0 "
                          "--token bucket-auth-token", stdin='{"key": "value"}')
 
         assert_that(cmd.exit_status, is_(0))
@@ -74,6 +75,7 @@ class TestBackdropSend(unittest.TestCase):
         cmd = command.do("./backdrop-send "
                          "--url http://localhost:8000/bucket "
                          "--token bucket-auth-token "
+                         "--sleep 0 "
                          "--attempts 4", stdin='{"key": "value"}')
 
         assert_that(cmd.exit_status, is_(0))
@@ -83,6 +85,7 @@ class TestBackdropSend(unittest.TestCase):
         cmd = command.do("./backdrop-send "
                          "--url http://localhost:8000/bucket "
                          "--token bucket-auth-token "
+                         "--sleep 0 "
                          "--attempts 2", stdin='{"key": "value"}')
 
         assert_that(cmd.exit_status, is_not(0))

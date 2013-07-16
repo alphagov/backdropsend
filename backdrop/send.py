@@ -3,6 +3,7 @@ import sys
 import select
 
 import requests
+import time
 
 
 def no_piped_input(arguments):
@@ -21,6 +22,8 @@ def parse_args(args, input):
                         required=False, default=3, type=int)
     parser.add_argument('--failfast', help="Don't retry sending data",
                         required=False, default=False, action='store_true')
+    parser.add_argument('--sleep', help=argparse.SUPPRESS,
+                        required=False, default=3, type=int)
     parser.add_argument('file', help="File containing JSON to send", nargs='?',
                         type=argparse.FileType('r'),
                         default=input)
@@ -36,7 +39,6 @@ UNAUTHORIZED = ("Unable to send to backdrop. "
                 "Unauthorised: check your access token.", 4)
 HTTP_ERROR = ("Unable to send to backdrop. Server responded with {status}.", 8)
 CONNECTION_ERROR = ("Unable to send to backdrop. Connection error.", 16)
-
 
 def fail(error, last_retry, **kwargs):
     print >> sys.stderr, error[0].format(**kwargs)
@@ -74,3 +76,5 @@ def send(args, input=None):
                 ok()
         except (requests.ConnectionError, requests.exceptions.Timeout) as e:
             fail(CONNECTION_ERROR, last_retry)
+
+        time.sleep(arguments.sleep)
