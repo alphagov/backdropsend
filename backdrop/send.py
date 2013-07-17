@@ -28,12 +28,10 @@ def post(data, arguments):
 def post_attempts(arguments):
     data = arguments.file.read()
 
-    for i in range(arguments.attempts):
-        last_attempt = i == (arguments.attempts - 1)
+    for attempt in range(1, arguments.attempts + 1):
+        last_attempt = attempt == arguments.attempts
         
-        status = post(data, arguments)
-
-        yield status, last_attempt
+        yield post(data, arguments), last_attempt
 
         log("Retrying...")
         time.sleep(arguments.sleep)
