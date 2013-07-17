@@ -13,7 +13,7 @@ backdrop-send \- send data to backdrop
 .I num
 .B ]
 .B [--failfast]
-.B [file-to-send]
+.I file-to-send
 .P
 .I pipe
 .B | backdrop-send --url
@@ -40,13 +40,13 @@ the url of the backdrop bucket eg.
 .IP --token
 the authorization token for the bucket
 .IP "--timeout num"
-Request timeout. Default: 5 seconds
+request timeout. Default: 5 seconds
 .IP "--attempts num"
-Number of times to attempt sending data. Default: 3
+number of times to attempt sending data. Default: 3
 .IP --failfast
-Don't retry sending data
+don't retry sending data
 .SH FILES
-.IP [file-to-send]
+.IP file-to-send
 utf8 encoded file in json format
 .\" This is the last section by convention
 .SH SEE ALSO
