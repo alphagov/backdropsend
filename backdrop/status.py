@@ -1,10 +1,8 @@
+from collections import namedtuple
 
-class Status():
-    def __init__(self, message, code):
-        self.code = code
-        self.message = message
-        self.details = {}
-  
+class Status(namedtuple('Status', ['code', 'message'])):
+    details = {}
+
     def description(self):
         return self.message.format(**self.details)
   
@@ -15,10 +13,10 @@ class Status():
     def is_ok(self):
         return self.code == 0
 
-OK = Status("", 0)
-UNAUTHORIZED = Status("Unable to send to backdrop. "
-                "Unauthorised: check your access token.", 4)
-HTTP_ERROR = Status("Unable to send to backdrop. Server responded with {status}. "
-              "Error: {message}.", 8)
-CONNECTION_ERROR = Status("Unable to send to backdrop. Connection error.", 16)
+OK = Status(0, "")
+UNAUTHORIZED = Status(4, "Unable to send to backdrop. "
+                "Unauthorised: check your access token.")
+HTTP_ERROR = Status(8, "Unable to send to backdrop. Server responded with {status}. "
+              "Error: {message}.")
+CONNECTION_ERROR = Status(16, "Unable to send to backdrop. Connection error.")
 
