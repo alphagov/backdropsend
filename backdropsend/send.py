@@ -2,8 +2,8 @@ import sys
 import requests
 import time
 
-from backdrop.argumentsparser import parse_args
-from backdrop.status import *
+from backdropsend.argumentsparser import parse_args
+from backdropsend.status import *
 
 def log(message):
     print >> sys.stderr, message
