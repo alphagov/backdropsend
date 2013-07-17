@@ -17,7 +17,7 @@ setup(
     license='MIT',
     keywords='api data performance_platform',
 
-    data_files=[('/usr/share/man/man1', ['docs/backdrop-send.1.gz'])],
+    data_files=[('/usr/local/share/man/man1', ['docs/backdrop-send.1.gz'])],
 
     install_requires=['requests', 'argparse'],
 )
