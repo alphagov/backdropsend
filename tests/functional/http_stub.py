@@ -1,13 +1,12 @@
 from BaseHTTPServer import BaseHTTPRequestHandler, HTTPServer
 import threading
-
+import time
+import errno
 
 class HttpStub(BaseHTTPRequestHandler):
 
-    requests = []
     server = None
     thread = None
-    response_code = 200
 
     @classmethod
     def last_request(cls):
@@ -16,7 +15,8 @@ class HttpStub(BaseHTTPRequestHandler):
     @classmethod
     def reset(cls):
         cls.requests = []
-        cls.response_code = 200
+        cls.response_codes = [200]        
+        cls.response_delay = 0
 
     def do_POST(self):
         self.requests.append({
@@ -25,7 +25,18 @@ class HttpStub(BaseHTTPRequestHandler):
             "body": self.body()
         })
 
-        self.send_response(self.response_code)
+        if (self.response_delay > 0):
+            time.sleep(self.response_delay)
+        
+        try:
+            next_response = self.response_codes.pop(0)
+            self.response_codes.append(next_response)
+            self.send_response(next_response)
+        except IOError, e:
+            if e.errno == errno.EPIPE:
+                pass
+            else:
+                raise e
 
         return
 
@@ -46,5 +57,9 @@ class HttpStub(BaseHTTPRequestHandler):
         cls.thread.join()
 
     @classmethod
-    def set_response_code(cls, code):
-        cls.response_code = code
+    def set_response_codes(cls, *codes):
+        cls.response_codes = list(codes)
+
+    @classmethod
+    def set_response_delay(cls, delay):
+        cls.response_delay = delay
