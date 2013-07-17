@@ -6,6 +6,13 @@ backdrop-send \- send data to backdrop
 .I url-to-bucket
 .B --token
 .I authorization-token
+.B [--timeout
+.I num
+.B ]
+.B [--attempts
+.I num
+.B ]
+.B [--failfast]
 .B [file-to-send]
 .P
 .I pipe
@@ -13,6 +20,13 @@ backdrop-send \- send data to backdrop
 .I url-to-backdrop
 .B --token
 .I authorization-token
+.B [--timeout
+.I num
+.B ]
+.B [--attempts
+.I num
+.B ]
+.B [--failfast]
 .SH DESCRIPTION
 Sends data to a bucket in 
 .B backdrop 
@@ -20,11 +34,17 @@ over http using a bearer token for authentication.
 .SH OPTIONS
 .IP "-h --help"
 print help message and exit
-.IP --token
-the authorization token for the bucket
 .IP --url
 the url of the backdrop bucket eg.
 .I http://location_of_backdrop/my_bucket
+.IP --token
+the authorization token for the bucket
+.IP "--timeout num"
+Request timeout. Default: 5 seconds
+.IP "--attempts num"
+Number of times to attempt sending data. Default: 3
+.IP --failfast
+Don't retry sending data
 .SH FILES
 .IP [file-to-send]
 utf8 encoded file in json format
