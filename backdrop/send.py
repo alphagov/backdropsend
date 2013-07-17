@@ -40,10 +40,10 @@ def post_attempts(arguments):
 def send(args, input=None):
     arguments = parse_args(args, input)
 
-    for status, is_last_attempt in post_attempts(arguments):
-        log(status.description())
+    for post_status, is_last_attempt in post_attempts(arguments):
+        log(post_status.description())
 
-        if status.is_ok() or is_last_attempt:
+        if post_status.is_ok() or is_last_attempt:
             break
 
-    exit(status.code)
+    exit(post_status.code)
