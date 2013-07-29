@@ -19,4 +19,5 @@ UNAUTHORIZED = Status(4, "Unable to send to backdrop. "
 HTTP_ERROR = Status(8, "Unable to send to backdrop. Server responded with {status}. "
               "Error: {message}.")
 CONNECTION_ERROR = Status(16, "Unable to send to backdrop. Connection error.")
+TIMEOUT_ERROR = Status(32, "Unable to send to backdrop. Request timeout.")
 

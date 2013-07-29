@@ -22,7 +22,9 @@ def post(data, arguments):
             return HTTP_ERROR.with_details({ 'status': response.status_code, 'message': response.text })
         
         return OK
-    except (requests.ConnectionError, requests.exceptions.Timeout) as e:
+    except requests.exceptions.Timeout as e:
+        return TIMEOUT_ERROR
+    except requests.ConnectionError as e:
         return CONNECTION_ERROR
 
 def post_attempts(arguments):
