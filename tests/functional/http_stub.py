@@ -3,6 +3,7 @@ import threading
 import time
 import errno
 
+
 class HttpStub(BaseHTTPRequestHandler):
 
     server = None
@@ -25,7 +26,7 @@ class HttpStub(BaseHTTPRequestHandler):
             "body": self.body()
         })
 
-        if (self.response_delay > 0):
+        if self.response_delay > 0:
             time.sleep(self.response_delay)
         
         try:
@@ -39,6 +40,9 @@ class HttpStub(BaseHTTPRequestHandler):
                 raise e
 
         return
+
+    def log_request(self, code='-', size='-'):
+        pass
 
     def body(self):
         return self.rfile.read(int(self.headers.getheader('content-length')))
