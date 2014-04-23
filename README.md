@@ -11,8 +11,8 @@ CLI tool for sending data to Backdrop
 
 ## Example
 
-`backdrop-send --url https://location/of/backdrop/bucket --token TOPSECRET123456 myfile.json`
+`backdrop-send --url https://location/of/backdrop/data_set --token TOPSECRET123456 myfile.json`
 
 or
 
-`cat myfile.json | backdrop-send --url https://location/of/backdrop/bucket --token TOPSECRET123456`
+`cat myfile.json | backdrop-send --url https://location/of/backdrop/data_set --token TOPSECRET123456`

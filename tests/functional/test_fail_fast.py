@@ -15,7 +15,7 @@ class TestFailFast(unittest.TestCase):
     def test_it_fails_fast_when_flag_is_set(self):
         HttpStub.set_response_codes(500, 200)
         cmd = command.do("./backdrop-send "
-                         "--url http://localhost:8000/bucket "
+                         "--url http://localhost:8000/data_set "
                          "--token token "
                          "--failfast", stdin='{"key": "value"}')
 
@@ -24,7 +24,7 @@ class TestFailFast(unittest.TestCase):
     def test_it_fails_fast_when_set_and_also_passed_attempts(self):
         HttpStub.set_response_codes(500, 200, 200, 200, 200)
         cmd = command.do("./backdrop-send "
-                         "--url http://localhost:8000/bucket "
+                         "--url http://localhost:8000/data_set "
                          "--token token "
                          "--failfast "
                          "--attempts 5 ", stdin='{"key": "value"}')

@@ -7,9 +7,9 @@ def no_piped_input(arguments):
 
 def parse_args(args, input):
     parser = argparse.ArgumentParser()
-    parser.add_argument('--url', help="URL of the target bucket",
+    parser.add_argument('--url', help="URL of the target data-set",
                         required=True)
-    parser.add_argument('--token', help="Bearer token for the target bucket",
+    parser.add_argument('--token', help="Bearer token for the target data-set",
                         required=True)
     parser.add_argument('--timeout', help="Request timeout. Default: 5 seconds",
                         required=False, default=5, type=float)
