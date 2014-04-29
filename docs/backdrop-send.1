@@ -3,7 +3,7 @@
 backdrop-send \- send data to backdrop
 .SH SYNOPSIS
 .B backdrop-send [-h] --url
-.I url-to-bucket
+.I url-to-data-set
 .B --token
 .I authorization-token
 .B [--timeout
@@ -28,17 +28,17 @@ backdrop-send \- send data to backdrop
 .B ]
 .B [--failfast]
 .SH DESCRIPTION
-Sends data to a bucket in 
+Sends data to a data-set in 
 .B backdrop 
 over https using a bearer token for authentication.
 .SH OPTIONS
 .IP "-h --help"
 print help message and exit
 .IP --url
-the url of the backdrop bucket eg.
-.I https://location_of_backdrop/my_bucket
+the url of the backdrop data-set eg.
+.I https://location_of_backdrop/my_data_set
 .IP --token
-the authorization token for the bucket
+the authorization token for the data-set
 .IP "--timeout num"
 request timeout. Default: 5 seconds
 .IP "--attempts num"
